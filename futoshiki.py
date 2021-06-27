@@ -135,12 +135,13 @@ def principal():
         global lista_jugadas
         global tupla_jugadas
         global tupla_jugador
+        global lista_guardar
         global listaBotones
         global listajugadas
         global top_10_facil
         global top_10_inter
-        global top_10_diff
         global countganador
+        global top_10_diff
         global count150
         global count3
         cuadriculas = {
@@ -164,12 +165,13 @@ def principal():
                     (">", 0, 0), (">", 0, 1), ("4", 2, 1), ("<", 2, 1), ("˅", 3, 0), (">", 3, 1), (">", 4, 1),
                     ("˅", 4, 4)),
                 (
-                    ("1", 0, 1), ("4", 0, 4), (">", 1, 1), (">", 1, 3), ("^", 2, 1), ("˅", 2, 3), ("^", 2, 3),
+                    ("1", 0, 1), ("4", 0, 4), (">", 1, 1), (">", 1, 3), ("^", 2, 1), ("^", 2, 3),
                     ("˅", 3, 3),
                     (">", 3, 3), ("^", 4, 0)),
                 ((">", 1, 1), ("^", 1, 4), ("˅", 2, 0), (">", 3, 0), ("^", 3, 4), (">", 4, 0), ("3", 3, 1),
                  ("˅", 3, 1))]}
         lista_jugadas = []
+        lista_guardar = []
         tupla_jugadas = ()
         tupla_jugador = ()
         listajugadas = []
@@ -217,6 +219,7 @@ def principal():
             global tupla_jugador
             global tupla_jugadas
             global lista_jugadas
+            global lista_guardar
             global listajugadas
             global listaBotones
             global countganador
@@ -247,7 +250,7 @@ def principal():
                             if r == "ok":
                                 B.config(bg="White")
                             count1 += 1
-                            break
+                            return
                         if jugadas[2] == y:
                             B.config(bg="RED")
                             r = messagebox.showerror("ERROR",
@@ -255,7 +258,7 @@ def principal():
                             if r == "ok":
                                 B.config(bg="White")
                             count1 += 1
-                            break
+                            return
                 if jugadas[1] == x and jugadas[2] == y:
                     if jugadas[0] not in "^><˅":
                         count = lista_jugadas.index(jugadas)
@@ -263,9 +266,98 @@ def principal():
                         lista_jugadas[count][0] = str(numero_botones)
                         lista_jugadas[count] = tuple(lista_jugadas[count])
                         listajugadas += ((str(numero_botones), x, y),)
-                        break
+                        B.config(text=numero_botones)
+                        return
                     else:
-                        pass
+                        if jugadas[0] == "^":
+                            for jugada in lista_jugadas:
+                                if jugada[1] == x - 1 and jugada[2] == y and jugada[0].isdigit():
+                                    print(jugada, x, y, numero_botones, 1)
+                                    if jugada[0] > str(numero_botones):
+                                        B.config(bg="Red")
+                                        r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MAYOR")
+                                        if r == "ok":
+                                            B.config(bg="White")
+                                        return
+                        if jugadas[0] == "<":
+                            for jugada in lista_jugadas:
+                                if jugada[1] == x and jugada[2] == y + 1 and jugada[0].isdigit():
+                                    print(jugada, x, y, numero_botones, 3)
+                                    if jugada[0] < str(numero_botones):
+                                        B.config(bg="Red")
+                                        r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MENOR")
+                                        if r == "ok":
+                                            B.config(bg="White")
+                                        return
+                        if jugadas[0] == ">":
+                            for jugada in lista_jugadas:
+                                if jugada[1] == x and jugada[2] == y + 1 and jugada[0].isdigit():
+                                    print(jugada, x, y, numero_botones, 2)
+                                    if jugada[0] > str(numero_botones):
+                                        B.config(bg="Red")
+                                        r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MAYOR")
+                                        if r == "ok":
+                                            B.config(bg="White")
+                                        return
+                        if jugadas[0] == "˅":
+                            for jugada in lista_jugadas:
+                                if jugada[1] == x - 1 and jugada[2] == y and jugada[0].isdigit():
+                                    if jugada[0] < str(numero_botones):
+                                        B.config(bg="Red")
+                                        r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MENOR")
+                                        if r == "ok":
+                                            B.config(bg="White")
+                                        return
+                if jugadas[1] == x and jugadas[2] == y - 1:
+                    if jugadas[0] == "<":
+                        for jugada in lista_jugadas:
+                            if jugada[1] == x and jugada[2] == y - 1 and jugada[0].isdigit():
+                                if jugada[0] > str(numero_botones):
+                                    print(jugada, x, y, numero_botones, 1)
+                                    B.config(bg="Red")
+                                    r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MENOR")
+                                    if r == "ok":
+                                        B.config(bg="White")
+                                    return
+                    if jugadas[0] == ">":
+                        for jugada in lista_jugadas:
+                            if jugada[1] == x and jugada[2] == y - 1 and jugada[0].isdigit():
+                                print(jugada, x, y, numero_botones, 4)
+                                if jugada[0] < str(numero_botones):
+                                    B.config(bg="Red")
+                                    r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MAYOR")
+                                    if r == "ok":
+                                        B.config(bg="White")
+                                    return
+                if jugadas[1] == x + 1 and jugadas[2] == y:
+                    if jugadas[0] == "˅":
+                        for jugada in lista_jugadas:
+                            print(jugada)
+                            if jugada[1] == x + 1 and jugada[2] == y and jugada[0].isdigit():
+                                print(jugada, x, y, numero_botones, 5)
+                                if jugada[0] > str(numero_botones):
+                                    B.config(bg="Red")
+                                    r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MAYOR")
+                                    if r == "ok":
+                                        B.config(bg="White")
+                                    return
+                    if jugadas[0] == "^":
+                        for jugada in lista_jugadas:
+                            if jugada[1] == x + 1 and jugada[2] == y and jugada[0].isdigit():
+                                if jugada[0] < str(numero_botones):
+                                    B.config(bg="Red")
+                                    r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
+                                                                      "RESTRICCIÓN DE MENOR")
+                                    if r == "ok":
+                                        B.config(bg="White")
+                                    return
             if count1 == 0:
                 if numero_botones != 0:
                     B.config(text=numero_botones)
@@ -273,6 +365,7 @@ def principal():
                         lista_jugadas.append((str(numero_botones), x, y))
                         count3 += 1
                         listajugadas += ((str(numero_botones), x, y),)
+                        lista_guardar += ((str(numero_botones), x, y),)
                         if count150 - countganador == count3:
                             messagebox.showinfo("FELICIDADES", "¡EXCELENTE! JUEGO TERMINADO CON ÉXITO.")
                             tupla_jugador = list(tupla_jugador)
@@ -325,12 +418,12 @@ def principal():
 
         def iniciar_juego(configuracio):
             global lista_cuadricula
+            global lista_guardar
             global tupla_jugadas
             global lista_jugadas
             global listaBotones
-            global count150
             global countganador
-            lista_jugadas = []
+            global count150
             iniciarjuegoButton.config(command=lambda: nada())
             guardarpartidaButton.config(command=lambda: guardar())
             borrarjugadaButton.config(command=lambda: borrar_jugada())
@@ -353,11 +446,13 @@ def principal():
                                         C.config(command=lambda C=C: error(C))
                                         C.place(x=count2 + columnas, y=count1 + filas)
                                         countganador += 1
+                                        lista_guardar += ((cuadricula[0], cuadricula[1], cuadricula[2], "P"),)
                                     else:
                                         if cuadricula[0] == "˅" or cuadricula[0] == "^":
-                                            C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="White")
+                                            C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0)
                                             C.config(command=lambda C=C: error(C))
                                             C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
+                                            lista_guardar += ((cuadricula[0], cuadricula[1], cuadricula[2], "P"),)
                                             if len(listaBotones) < 25:
                                                 B = tk.Button(jueg, compound="c", height=2, width=5, bg="white")
                                                 B.config(
@@ -367,9 +462,10 @@ def principal():
                                                 count150 += 1
                                                 listaBotones += [1]
                                         else:
-                                            C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
+                                            C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0)
                                             C.config(command=lambda C=C: error(C))
                                             C.place(x=count2 + (columnas + 50), y=count1 - (filas - 10))
+                                            lista_guardar += ((cuadricula[0], cuadricula[1], cuadricula[2], "P"),)
                                             if len(listaBotones) < 25:
                                                 B = tk.Button(jueg, compound="c", height=2, width=5, bg="white")
                                                 B.config(command=lambda columnas=columnas, filas=filas, B=B:
@@ -410,7 +506,7 @@ def principal():
                         if filas == listajugadas[-1][1] and columnas == listajugadas[-1][2]:
                             B = tk.Button(jueg, compound="c", height=2, width=5, bg="white", text="")
                             B.config(command=lambda columnas=columnas, filas=filas, B=B:
-                            nombre_boton(columnas, filas, B, configuracio))
+                            nombre_boton(filas, columnas, B, configuracio))
                             B.place(x=count2 + columnas, y=count1 + filas)
                         count2 += 75
                     if count2 == 675:
@@ -419,8 +515,11 @@ def principal():
                 count3 -= 1
                 jugada = listajugadas[-1]
                 del listajugadas[-1]
-                lista_jugadas.remove(jugada)
-                messagebox.showinfo("BORRAR JUGADA", "SE BORRO LA JUGADA")
+                if jugada in lista_jugadas:
+                    lista_jugadas.remove(jugada)
+                    messagebox.showinfo("BORRAR JUGADA", "SE BORRO LA JUGADA")
+                else:
+                    messagebox.showerror("ERROR", " NO HAY MÁS JUGADAS PARA BORRAR.")
 
         def borrar_juego(configuracio):
             global lista_cuadricula
@@ -681,7 +780,6 @@ def principal():
             else:
                 segundosactualesLabel.config(text=configuracio[-2][4:7])
             segundosactualesLabel.place(x=210, y=720)
-
 
             horacambiarLabel = tk.Label(jueg, text="HORA NUEVA")
             horacambiarLabel.place(x=50, y=750)

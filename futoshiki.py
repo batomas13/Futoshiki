@@ -203,6 +203,65 @@ def principal():
         jueg.title("Futoshiki")
         """"""""""""""""""""""""" Funciones """""""""""""
 
+        def crear_cuadricula(lista_cuadricula):
+            global countganador
+            global count150
+            count150 = 0
+            countganador = 0
+            count1 = 165
+            count2 = 300
+            listaBotones = []
+            for cuadricula in lista_cuadricula:
+                print(cuadricula, cuadricula[3])
+                for columnas in range(5):
+                    for filas in range(5):
+                        if columnas == cuadricula[1] and filas == cuadricula[2]:
+                            if cuadricula[0].isdigit():
+                                C = tk.Button(jueg, compound="c", height=2, width=5, text=cuadricula[0], bg="white")
+                                C.config(command=lambda C=C: error(C))
+                                C.place(x=count2 + columnas, y=count1 + filas)
+                                countganador += 1
+                            else:
+                                if cuadricula[0] == "˅" or cuadricula[0] == "^":
+                                    C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
+                                    C.config(command=lambda C=C: error(C))
+                                    C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
+                                    if len(listaBotones) < 25:
+                                        B = tk.Button(jueg, compound="c", height=2, width=5, bg="white")
+                                        B.config(
+                                            command=lambda columnas=columnas, filas=filas, B=B: nombre_boton(
+                                                columnas, filas, B, configuracio))
+                                        B.place(x=count2 + columnas, y=count1 + filas)
+                                        count150 += 1
+                                        listaBotones += [1]
+                                else:
+                                    C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
+                                    C.config(command=lambda C=C: error(C))
+                                    C.place(x=count2 + (columnas + 50), y=count1 - (filas - 10))
+                                    if len(listaBotones) < 25:
+                                        B = tk.Button(jueg, compound="c", height=2, width=5, bg="white")
+                                        B.config(command=lambda columnas=columnas, filas=filas, B=B:
+                                        nombre_boton(columnas, filas, B, configuracio))
+                                        B.place(x=count2 + columnas, y=count1 + filas)
+                                        count150 += 1
+                                        listaBotones += [1]
+                            tupla_jugadas = (cuadricula[0], columnas, filas)
+                            lista_jugadas.append(tupla_jugadas)
+                        else:
+                            if len(listaBotones) < 25:
+                                B = tk.Button(jueg, compound="c", height=2, width=5, bg="White")
+                                B.config(
+                                    command=lambda columnas=columnas, filas=filas, B=B: nombre_boton(columnas,
+                                                                                                     filas, B,
+                                                                                                     configuracio))
+                                B.place(x=count2 + columnas, y=count1 + filas)
+                                count150 += 1
+                                listaBotones += [1]
+                        count2 += 75
+                    count1 += 75
+                    count2 = 300
+                count1 = 165
+
         def confirmar(nombre, configuracio):
             global tupla_jugador
             global top_10_facil
@@ -545,8 +604,6 @@ def principal():
             global count150
             global count3
             listaBotones = []
-            count1 = 165
-            count2 = 300
             r = messagebox.askquestion("BORRAR", "¿ESTÁ SEGURO DE BORRAR EL JUEGO?", )
             if r == "yes":
                 count3 = 0
@@ -554,55 +611,7 @@ def principal():
                 countganador = 0
                 listajugadas = []
                 lista_jugadas = []
-                for cuadricula in lista_cuadricula:
-                    for columnas in range(5):
-                        for filas in range(5):
-                            if columnas == cuadricula[1] and filas == cuadricula[2]:
-                                if cuadricula[0].isdigit():
-                                    C = tk.Button(jueg, compound="c", height=2, width=5, text=cuadricula[0], bg="white")
-                                    C.config(command=lambda C=C: error(C))
-                                    C.place(x=count2 + columnas, y=count1 + filas)
-                                    countganador += 1
-                                else:
-                                    if cuadricula[0] == "˅" or cuadricula[0] == "^":
-                                        C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
-                                        C.config(command=lambda C=C: error(C))
-                                        C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
-                                        if len(listaBotones) < 25:
-                                            B = tk.Button(jueg, compound="c", height=2, width=5, bg="white")
-                                            B.config(
-                                                command=lambda columnas=columnas, filas=filas, B=B: nombre_boton(
-                                                    columnas, filas, B, configuracio))
-                                            B.place(x=count2 + columnas, y=count1 + filas)
-                                            count150 += 1
-                                            listaBotones += [1]
-                                    else:
-                                        C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
-                                        C.config(command=lambda C=C: error(C))
-                                        C.place(x=count2 + (columnas + 50), y=count1 - (filas - 10))
-                                        if len(listaBotones) < 25:
-                                            B = tk.Button(jueg, compound="c", height=2, width=5, bg="white")
-                                            B.config(command=lambda columnas=columnas, filas=filas, B=B:
-                                            nombre_boton(columnas, filas, B, configuracio))
-                                            B.place(x=count2 + columnas, y=count1 + filas)
-                                            count150 += 1
-                                            listaBotones += [1]
-                                tupla_jugadas = (cuadricula[0], columnas, filas)
-                                lista_jugadas.append(tupla_jugadas)
-                            else:
-                                if len(listaBotones) < 25:
-                                    B = tk.Button(jueg, compound="c", height=2, width=5, bg="White")
-                                    B.config(
-                                        command=lambda columnas=columnas, filas=filas, B=B: nombre_boton(columnas,
-                                                                                                         filas, B,
-                                                                                                         configuracio))
-                                    B.place(x=count2 + columnas, y=count1 + filas)
-                                    count150 += 1
-                                    listaBotones += [1]
-                            count2 += 75
-                        count1 += 75
-                        count2 = 300
-                    count1 = 165
+                crear_cuadricula(lista_cuadricula)
 
         def button1():
             global numero_botones
@@ -661,11 +670,29 @@ def principal():
             global tupla_jugador
             global lista_guardar
             f = open("futoshiki2021juegoactual", "w")
-            f.write(str(configuracio)),
-            f.write(str(lista_guardar))
+            f.write(str(configuracio) + "\n")
+            f.write(str(lista_guardar).replace(">",">").replace("<","<").replace("^","^").replace("˅","v") + "\n")
             f.write(str(tupla_jugador[0]))
             f.close()
             messagebox.showinfo("SE GUARDÓ", "SE GUARDÓ SU PARTIDA")
+
+        def cargar():
+            global tupla_jugador
+            global configuracio
+            borrarjuegoButton.config(command=lambda: borrar_juego(configuracio))
+            terminarjuegoButton.config(command=lambda: terminar_juego(configuracio))
+            borrarjugadaButton.config(command=lambda: borrar_jugada())
+            guardarpartidaButton.config(command=lambda: guardar())
+            test = open("futoshiki2021juegoactual", 'r')
+            for x, b in enumerate(test):
+                if x == 0:
+                    configuracio = b
+                if x == 1:
+                    cuadricula = b.split("),")
+                    crear_cuadricula(cuadricula)
+                else:
+                    tupla_jugador = (b, )
+            test.close()
 
         def nada():
             pass
@@ -721,6 +748,8 @@ def principal():
             def close():
                 global running
                 running = True
+                timer()
+
             top_10.title("TOP 10")
             top_10.geometry("1000x1000")
             nivelfacilLabel = tk.Label(top_10, text="Nivel Fácil:")
@@ -858,7 +887,7 @@ def principal():
 
         guardarpartidaButton = tk.Button(jueg, text="GUARDAR PARTIDA")
         guardarpartidaButton.place(x=450, y=800)
-        cargarpartidaButton = tk.Button(jueg, text="CARGAR PARTIDA")
+        cargarpartidaButton = tk.Button(jueg, text="CARGAR PARTIDA", command=lambda: cargar())
         cargarpartidaButton.place(x=650, y=800)
 
         jueg.mainloop()

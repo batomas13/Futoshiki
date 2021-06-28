@@ -1,4 +1,7 @@
+import time
 import random
+import atexit
+import threading
 import tkinter as tk
 from datetime import datetime
 from tkinter import messagebox
@@ -8,14 +11,18 @@ def principal():
     global top_10_facil
     global top_10_inter
     global top_10_diff
+    global times
     configuracio = ["FÁCIL", "SI", "derecha"]
     top_10_inter = []
     top_10_facil = []
     top_10_diff = []
+    times = 0
 
     """"""""""""""" FUNCIONES """""""""
 
     def configuracion(configuracio):
+        global times
+        times = 0
         configraci = tk.Toplevel()
         configraci.title("Configuración")
         configraci.geometry("700x700")
@@ -66,6 +73,7 @@ def principal():
             f.close()
 
         def aceptar(h, m, s, configuracio):
+            global times
             hor = int(h.get())
             min = int(m.get())
             seg = int(s.get())
@@ -73,6 +81,7 @@ def principal():
                 messagebox.showerror("ERROR", "TIENE QUE AGREGAR TIEMPO")
                 return
             if 0 <= hor <= 2 and 0 <= min <= 59 and 0 <= seg <= 59:
+                times = hor * 3600 + min * 60 + seg
                 tiempo = h.get() + ":" + m.get() + ":" + s.get()
                 configuracio[1] = "TIMER"
                 if len(configuracio) == 4:
@@ -143,7 +152,10 @@ def principal():
         global countganador
         global top_10_diff
         global count150
+        global running
         global count3
+        global times
+        global tim
         cuadriculas = {
             "FÁCIL": [(("1", 0, 2), ("5", 0, 3), ("1", 1, 1), ("2", 1, 2), ("3", 1, 4), ("2", 3, 3), ("4", 4, 2),
                        ("1", 4, 3), ("2", 4, 4)), (
@@ -176,13 +188,15 @@ def principal():
         tupla_jugador = ()
         listajugadas = []
         count3 = 0
+        tim = times
         count150 = 0
+        running = True
         countganador = 0
         numero_botones = 0
-        nombre = tk.StringVar()
-        hora = tk.StringVar()
         min = tk.StringVar()
         seg = tk.StringVar()
+        hora = tk.StringVar()
+        nombre = tk.StringVar()
 
         jueg = tk.Toplevel()
         jueg.geometry("1000x850")
@@ -432,6 +446,8 @@ def principal():
             listaBotones = []
             count1 = 165
             count2 = 300
+            if configuracio[1] == "TIMER":
+                countdown_tread.start()
             for juegos in cuadriculas:
                 if juegos == configuracio[0]:
                     count = random.randint(0, 2)
@@ -643,9 +659,10 @@ def principal():
             global lista_cuadricula
             global lista_jugadas
             global tupla_jugador
-            f = open("futoshiki2021juegoactual", "a")
+            global lista_guardar
+            f = open("futoshiki2021juegoactual", "w")
             f.write(str(configuracio)),
-            f.write(str(lista_cuadricula))
+            f.write(str(lista_guardar))
             f.write(str(tupla_jugador[0]))
             f.close()
             messagebox.showinfo("SE GUARDÓ", "SE GUARDÓ SU PARTIDA")
@@ -669,6 +686,7 @@ def principal():
                 iniciar_juego(configuracio)
 
         def aceptar(h, m, s, configuracio):
+            global times
             hor = int(h.get())
             min = int(m.get())
             seg = int(s.get())
@@ -676,6 +694,7 @@ def principal():
                 messagebox.showerror("ERROR", "TIENE QUE AGREGAR TIEMPO")
                 return
             if 0 <= hor <= 2 and 0 <= min <= 59 and 0 <= seg <= 59:
+                times = hor * 3600 + min * 60 + seg
                 tiempo = h.get() + ":" + m.get() + ":" + s.get()
                 configuracio[2] = tiempo
                 messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN EL TIMER")
@@ -692,10 +711,16 @@ def principal():
             global top_10_facil
             global top_10_inter
             global top_10_diff
+            global running
+            running = False
             top_10 = tk.Toplevel()
             count0 = 40
             count1 = 40
             count2 = 40
+
+            def close():
+                global running
+                running = True
             top_10.title("TOP 10")
             top_10.geometry("1000x1000")
             nivelfacilLabel = tk.Label(top_10, text="Nivel Fácil:")
@@ -725,7 +750,27 @@ def principal():
                 tk.Label(top_10, text=top_10_diff[c][0]).place(x=700, y=count2)
                 tk.Label(top_10, text=top_10_diff[c][1]).place(x=800, y=count2)
                 count2 += 50
+            atexit.register(close)
             top_10.mainloop()
+
+        def timer():
+            global times
+            global tim
+            global running
+            while running:
+                print(times)
+                if times == 0:
+                    r = messagebox.askquestion("ERROR")
+                    if r == "yes":
+                        times += tim + 1
+                    else:
+                        jueg.destroy()
+                        juego(configuracio)
+
+                time.sleep(1)
+                times -= 1
+            print(running)
+        countdown_tread = threading.Thread(target=timer)
 
         futoshikiLabel = tk.Label(jueg, text="FUTOSHIKI", bg="red", bd=50, width=50, fg="White", font=22)
         futoshikiLabel.pack()

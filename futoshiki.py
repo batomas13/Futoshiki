@@ -525,7 +525,6 @@ def principal():
                                     else:
                                         if cuadricula[0] == "˅" or cuadricula[0] == "^":
                                             C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0)
-                                            C.config(command=lambda C=C: error(C))
                                             C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
                                             lista_guardar += ((cuadricula[0], cuadricula[1], cuadricula[2], "P"),)
                                             if len(listaBotones) < 25:
@@ -688,7 +687,7 @@ def principal():
                 if x == 0:
                     configuracio = b
                 if x == 1:
-                    cuadricula = b.split("),")
+
                     crear_cuadricula(cuadricula)
                 else:
                     tupla_jugador = (b, )

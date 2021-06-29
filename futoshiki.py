@@ -2,6 +2,7 @@ import time
 import random
 import atexit
 import threading
+import webbrowser
 import tkinter as tk
 from datetime import datetime
 from tkinter import messagebox
@@ -155,7 +156,9 @@ def principal():
         global running
         global count3
         global times
+        global tims
         global tim
+        global run
         cuadriculas = {
             "FÁCIL": [(("1", 0, 2), ("5", 0, 3), ("1", 1, 1), ("2", 1, 2), ("3", 1, 4), ("2", 3, 3), ("4", 4, 2),
                        ("1", 4, 3), ("2", 4, 4)), (
@@ -187,6 +190,8 @@ def principal():
         tupla_jugadas = ()
         tupla_jugador = ()
         listajugadas = []
+        tims = 0
+        run = 0
         count3 = 0
         tim = times
         count150 = 0
@@ -212,7 +217,6 @@ def principal():
             count2 = 300
             listaBotones = []
             for cuadricula in lista_cuadricula:
-                print(cuadricula, cuadricula[3])
                 for columnas in range(5):
                     for filas in range(5):
                         if columnas == cuadricula[1] and filas == cuadricula[2]:
@@ -223,7 +227,7 @@ def principal():
                                 countganador += 1
                             else:
                                 if cuadricula[0] == "˅" or cuadricula[0] == "^":
-                                    C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
+                                    C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0)
                                     C.config(command=lambda C=C: error(C))
                                     C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
                                     if len(listaBotones) < 25:
@@ -235,7 +239,7 @@ def principal():
                                         count150 += 1
                                         listaBotones += [1]
                                 else:
-                                    C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0, bg="white")
+                                    C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0)
                                     C.config(command=lambda C=C: error(C))
                                     C.place(x=count2 + (columnas + 50), y=count1 - (filas - 10))
                                     if len(listaBotones) < 25:
@@ -262,7 +266,7 @@ def principal():
                     count2 = 300
                 count1 = 165
 
-        def confirmar(nombre, configuracio):
+        def confirmar(nombre, configuracio, cuadricula):
             global tupla_jugador
             global top_10_facil
             global top_10_inter
@@ -283,11 +287,63 @@ def principal():
                 messagebox.showerror("ERROR", "TIENE QUE SER UN NOMBRE VALIDO")
                 return
             else:
-                tupla_jugador = (nombre.get(), datetime.now().strftime('%H:%M:%S'))
-                iniciarjuegoButton.config(command=lambda: iniciar_juego(configuracio))
+                tupla_jugador = (nombre.get(),)
+                iniciarjuegoButton.config(command=lambda: iniciar_juego(configuracio, cuadricula))
                 messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ EL NOMBRE DE USUARIO, SUERTE EN LA PARTIDA")
 
+        def definirtop(configuracio, tiempo_total):
+            global top_10_facil
+            global top_10_inter
+            global top_10_diff
+            count2 = 0
+            count4 = 0
+            count5 = 0
+            if configuracio[0] == "FÁCIL":
+                if not top_10_facil:
+                    top_10_facil.append(tupla_jugador)
+                else:
+                    for ranking in top_10_facil:
+                        if ranking[1] > tiempo_total:
+                            print(ranking)
+                            count = top_10_facil.index(ranking)
+                            top_10_facil.insert(count, tupla_jugador)
+                            break
+                        count5 += 1
+                    if count5 == len(top_10_facil):
+                        top_10_facil.append(tupla_jugador)
+                    if len(top_10_facil) > 10:
+                        del top_10_facil[-1]
+            if configuracio[0] == "INTERMEDIO":
+                if not top_10_inter:
+                    top_10_inter.append(tupla_jugador)
+                else:
+                    for ranking in top_10_inter:
+                        if ranking[1] > tiempo_total:
+                            count = top_10_inter.index(ranking)
+                            top_10_inter.insert(count, tupla_jugador)
+                            break
+                        count2 += 1
+                    if count2 == len(top_10_inter):
+                        top_10_inter.append(tupla_jugador)
+                    if len(top_10_inter) > 10:
+                        del top_10_inter[-1]
+            if configuracio[0] == "DIFÍCIL":
+                if not top_10_diff:
+                    top_10_diff.append(tupla_jugador)
+                else:
+                    for ranking in top_10_diff:
+                        if ranking[1] > tiempo_total:
+                            count = top_10_diff.index(ranking)
+                            top_10_diff.insert(count, tupla_jugador)
+                            break
+                        count4 += 1
+                    if count4 == len(top_10_diff):
+                        top_10_diff.append(tupla_jugador)
+                    if len(top_10_diff) > 10:
+                        del top_10_diff[-1]
+
         def nombre_boton(x, y, B, configuracio):
+            global times
             global numero_botones
             global tupla_jugador
             global tupla_jugadas
@@ -301,12 +357,14 @@ def principal():
             global top_10_diff
             global count150
             global count3
+            global tim
+            global tims
+            global run
+            global running
             lista_jugada = lista_jugadas
             tupla_jugadas = (str(numero_botones), x, y)
             count1 = 0
-            count2 = 0
-            count4 = 0
-            count5 = 0
+
             if numero_botones == 0:
                 B.config(bg="RED")
                 r = messagebox.showerror("ERROR", " FALTA QUE SELECCIONE UN DÍGITO")
@@ -345,7 +403,6 @@ def principal():
                         if jugadas[0] == "^":
                             for jugada in lista_jugadas:
                                 if jugada[1] == x - 1 and jugada[2] == y and jugada[0].isdigit():
-                                    print(jugada, x, y, numero_botones, 1)
                                     if jugada[0] > str(numero_botones):
                                         B.config(bg="Red")
                                         r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
@@ -356,7 +413,6 @@ def principal():
                         if jugadas[0] == "<":
                             for jugada in lista_jugadas:
                                 if jugada[1] == x and jugada[2] == y + 1 and jugada[0].isdigit():
-                                    print(jugada, x, y, numero_botones, 3)
                                     if jugada[0] < str(numero_botones):
                                         B.config(bg="Red")
                                         r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
@@ -367,7 +423,6 @@ def principal():
                         if jugadas[0] == ">":
                             for jugada in lista_jugadas:
                                 if jugada[1] == x and jugada[2] == y + 1 and jugada[0].isdigit():
-                                    print(jugada, x, y, numero_botones, 2)
                                     if jugada[0] > str(numero_botones):
                                         B.config(bg="Red")
                                         r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
@@ -390,7 +445,6 @@ def principal():
                         for jugada in lista_jugadas:
                             if jugada[1] == x and jugada[2] == y - 1 and jugada[0].isdigit():
                                 if jugada[0] > str(numero_botones):
-                                    print(jugada, x, y, numero_botones, 1)
                                     B.config(bg="Red")
                                     r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
                                                                       "RESTRICCIÓN DE MENOR")
@@ -400,7 +454,6 @@ def principal():
                     if jugadas[0] == ">":
                         for jugada in lista_jugadas:
                             if jugada[1] == x and jugada[2] == y - 1 and jugada[0].isdigit():
-                                print(jugada, x, y, numero_botones, 4)
                                 if jugada[0] < str(numero_botones):
                                     B.config(bg="Red")
                                     r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
@@ -411,9 +464,7 @@ def principal():
                 if jugadas[1] == x + 1 and jugadas[2] == y:
                     if jugadas[0] == "˅":
                         for jugada in lista_jugadas:
-                            print(jugada)
                             if jugada[1] == x + 1 and jugada[2] == y and jugada[0].isdigit():
-                                print(jugada, x, y, numero_botones, 5)
                                 if jugada[0] > str(numero_botones):
                                     B.config(bg="Red")
                                     r = messagebox.showerror("ERROR", "JUGADA NO ES VÁLIDA PORQUE NO CUMPLE CON LA "
@@ -440,56 +491,28 @@ def principal():
                         listajugadas += ((str(numero_botones), x, y),)
                         lista_guardar += ((str(numero_botones), x, y),)
                         if count150 - countganador == count3:
+                            running = False
+                            run = False
                             messagebox.showinfo("FELICIDADES", "¡EXCELENTE! JUEGO TERMINADO CON ÉXITO.")
                             tupla_jugador = list(tupla_jugador)
-                            h = int(datetime.now().strftime('%H')) - int(tupla_jugador[1][0:2])
-                            min = int(datetime.now().strftime('%M')) - int(tupla_jugador[1][3:5])
-                            seg = int(datetime.now().strftime('%S')) - int(tupla_jugador[1][6:8])
-                            tiempo_actual = str(h) + ":" + str(min) + ":" + str(seg)
-                            tupla_jugador[1] = tiempo_actual
+                            if configuracio[1] == "TIMER":
+                                tiempo_actual = tim - times
+                                mins, secs = divmod(tiempo_actual, 60)
+                            else:
+                                mins, secs = divmod(tims, 60)
+                            h = 0
+                            if mins >= 60:
+                                h, mins = divmod(mins, 60)
+                            tiempo_total = str(h) + ":" + str(mins) + ":" + str(secs)
+                            tupla_jugador.append(tiempo_total)
                             tupla_jugador = tuple(tupla_jugador)
-                            if configuracio[0] == "FÁCIL":
-                                if not top_10_facil:
-                                    top_10_facil.append(tupla_jugador)
-                                else:
-                                    for ranking in top_10_facil:
-                                        if ranking[1] > tiempo_actual:
-                                            count = top_10_facil.index(ranking)
-                                            top_10_facil.insert(count - 1, tupla_jugador)
-                                        count5 += 1
-                                    if count5 == len(top_10_facil):
-                                        top_10_facil.append(tupla_jugador)
-                                    if len(top_10_facil) > 10:
-                                        del top_10_facil[-1]
-                            if configuracio[0] == "INTERMEDIO":
-                                if not top_10_inter:
-                                    top_10_inter.append(tupla_jugador)
-                                else:
-                                    for ranking in top_10_inter:
-                                        if ranking[1] > tiempo_actual:
-                                            count = top_10_inter.index(ranking)
-                                            top_10_inter.insert(count - 1, tupla_jugador)
-                                        count2 += 1
-                                    if count2 == len(top_10_inter):
-                                        top_10_inter.append(tupla_jugador)
-                                    if len(top_10_inter) > 10:
-                                        del top_10_inter[-1]
-                            if configuracio[0] == "DIFÍCIL":
-                                if not top_10_diff:
-                                    top_10_diff.append(tupla_jugador)
-                                else:
-                                    for ranking in top_10_diff:
-                                        if ranking[1] > tiempo_actual:
-                                            count = top_10_diff.index(ranking)
-                                            top_10_diff.insert(count - 1, tupla_jugador)
-                                        count4 += 1
-                                    if count4 == len(top_10_diff):
-                                        top_10_diff.append(tupla_jugador)
-                                    if len(top_10_diff) > 10:
-                                        del top_10_diff[-1]
+                            if configuracio[1] != "NO":
+                                print(tiempo_total)
+                                definirtop(configuracio, tiempo_total)
+                            jueg.destroy()
                             juego(configuracio)
 
-        def iniciar_juego(configuracio):
+        def iniciar_juego(configuracio, cua):
             global lista_cuadricula
             global lista_guardar
             global tupla_jugadas
@@ -497,15 +520,19 @@ def principal():
             global listaBotones
             global countganador
             global count150
+            global run
+            run = True
             iniciarjuegoButton.config(command=lambda: nada())
             guardarpartidaButton.config(command=lambda: guardar())
             borrarjugadaButton.config(command=lambda: borrar_jugada())
-            borrarjuegoButton.config(command=lambda: borrar_juego(configuracio))
-            terminarjuegoButton.config(command=lambda: terminar_juego(configuracio))
+            borrarjuegoButton.config(command=lambda: borrar_juego())
+            terminarjuegoButton.config(command=lambda: terminar_juego(configuracio, cua))
             listaBotones = []
             count1 = 165
             count2 = 300
             if configuracio[1] == "TIMER":
+                countdown_tread.start()
+            if configuracio[1] == "SI":
                 countdown_tread.start()
             for juegos in cuadriculas:
                 if juegos == configuracio[0]:
@@ -525,6 +552,7 @@ def principal():
                                     else:
                                         if cuadricula[0] == "˅" or cuadricula[0] == "^":
                                             C = tk.Button(jueg, text=cuadricula[0], height=1, width=2, bd=0)
+                                            C.config(command=lambda C=C: error(C))
                                             C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
                                             lista_guardar += ((cuadricula[0], cuadricula[1], cuadricula[2], "P"),)
                                             if len(listaBotones) < 25:
@@ -595,14 +623,13 @@ def principal():
                 else:
                     messagebox.showerror("ERROR", " NO HAY MÁS JUGADAS PARA BORRAR.")
 
-        def borrar_juego(configuracio):
+        def borrar_juego():
             global lista_cuadricula
             global lista_jugadas
             global listajugadas
             global countganador
             global count150
             global count3
-            listaBotones = []
             r = messagebox.askquestion("BORRAR", "¿ESTÁ SEGURO DE BORRAR EL JUEGO?", )
             if r == "yes":
                 count3 = 0
@@ -668,35 +695,169 @@ def principal():
             global lista_jugadas
             global tupla_jugador
             global lista_guardar
-            f = open("futoshiki2021juegoactual", "w")
+            global tims
+            global runs
+            runs = False
+            tupla_jugador += (tims,)
+            f = open("futoshiki2021juegoactual.dat", "w")
             f.write(str(configuracio) + "\n")
-            f.write(str(lista_guardar).replace(">",">").replace("<","<").replace("^","^").replace("˅","v") + "\n")
-            f.write(str(tupla_jugador[0]))
+            f.write(str(lista_guardar).replace(">", ">").replace("<", "<").replace("^", "^").replace("˅", "v") + "\n")
+            f.write(str(tupla_jugador))
             f.close()
             messagebox.showinfo("SE GUARDÓ", "SE GUARDÓ SU PARTIDA")
 
-        def cargar():
+        def cargar(cuadricula):
             global tupla_jugador
+            global lista_jugada
             global configuracio
-            borrarjuegoButton.config(command=lambda: borrar_juego(configuracio))
-            terminarjuegoButton.config(command=lambda: terminar_juego(configuracio))
+            global countganador
+            global count150
+            global tims
+            global run
+            count1 = 165
+            count2 = 300
+            count150 = 0
+            countganador = 0
+            listaBotones = []
+            configuracio = []
+            P = 25
+            run = True
+            nombres = ""
+            tiempo = ""
+            confg = ""
+            borrarjuegoButton.config(command=lambda: borrar_juego())
+            terminarjuegoButton.config(command=lambda: terminar_juego(configuracio, cuadricula))
             borrarjugadaButton.config(command=lambda: borrar_jugada())
             guardarpartidaButton.config(command=lambda: guardar())
-            test = open("futoshiki2021juegoactual", 'r')
+            test = open("futoshiki2021juegoactual.dat", 'r')
             for x, b in enumerate(test):
                 if x == 0:
-                    configuracio = b
+                    configracio = b
+                    for conf in configracio:
+                        if conf.isalpha():
+                            confg += conf
+                        else:
+                            if confg.isalpha():
+                                configuracio += [confg]
+                                confg = ""
                 if x == 1:
+                    cua = b.split("),")
+                    for a in cua:
+                        if not "P" in a:
+                            P -= 1
+                    for e in cua:
+                        for columnas in range(5):
+                            for filas in range(5):
+                                if "P" in e:
+                                    if columnas == int(e[7]) and filas == int(e[10]):
+                                        if e[3].isdigit():
+                                            C = tk.Button(jueg, text=e[3], compound="c", height=2, width=5, bg="White")
+                                            C.place(x=columnas + count2, y=filas + count1)
+                                            C.config(command=lambda C=C: error(C))
+                                            countganador += 1
+                                        else:
+                                            if e[3] == "v" or e[3] == "^":
+                                                C = tk.Button(jueg, height=1, width=2, bd=0)
+                                                if e[3] == "v":
+                                                    C.config(text="˅")
+                                                else:
+                                                    C.config(text=e[3])
+                                                C.place(x=count2 + (columnas + 10), y=count1 + (filas - 25))
+                                                if len(listaBotones) < 25:
+                                                    B = tk.Button(jueg, compound="c", height=2, width=5, bg="White")
+                                                    B.place(x=columnas + count2, y=filas + count1)
+                                                    B.config(command=lambda B=B, columnas=int(columnas), filas=int(filas):
+                                                    nombre_boton(columnas, filas, B, configuracio))
+                                                    listaBotones += [1]
+                                                    count150 += 1
+                                            else:
+                                                C = tk.Button(jueg, text=e[3], height=1, width=2, bd=0)
+                                                C.config(command=lambda C=C: error(C))
+                                                C.place(x=count2 + (columnas + 50), y=count1 - (filas - 10))
+                                                if len(listaBotones) < 25:
+                                                    B = tk.Button(jueg, compound="c", height=2, width=5, bg="White")
+                                                    B.place(x=columnas + count2, y=filas + count1)
+                                                    B.config(command=lambda B=B, columnas=int(columnas), filas=int(filas):
+                                                    nombre_boton(columnas, filas, B, configuracio))
+                                                    listaBotones += [1]
+                                                    count150 += 1
+                                        if e[3] == "v":
+                                            tupla_jugadas = ("˅", int(columnas), int(filas))
+                                        else:
+                                            tupla_jugadas = (e[3], int(columnas), int(filas))
+                                        lista_jugadas.append((tupla_jugadas), )
+                                    else:
+                                        if len(listaBotones) < P:
+                                            B = tk.Button(jueg, compound="c", height=2, width=5, bg="White")
+                                            B.place(x=columnas + count2, y=filas + count1)
+                                            B.config(command=lambda B=B, columnas=int(columnas), filas=int(filas):
+                                            nombre_boton(columnas, filas, B, configuracio))
+                                            listaBotones += [1]
+                                            count150 += 1
 
-                    crear_cuadricula(cuadricula)
+                                else:
+                                    if len(listaBotones) < 25:
+                                        if columnas == int(e[7]) and filas == int(e[10]):
+                                            B = tk.Button(jueg, compound="c", height=2, width=5, bg="White", text=e[3])
+                                            B.place(x=columnas + count2, y=filas + count1)
+                                            B.config(command=lambda B=B, columnas=int(columnas), filas=int(filas):
+                                            nombre_boton(columnas, filas, B, configuracio))
+                                            listaBotones += [1]
+                                            count150 += 1
+                                            tupla_jugadas = (e[3], int(columnas), int(filas))
+                                            lista_jugadas.append((tupla_jugadas),)
+
+
+
+                                count2 += 75
+                            count2 = 300
+                            count1 += 75
+                        count1 = 165
+                if x == 2:
+                    tuplajugador = b
+                    for jugas in tuplajugador:
+                        if jugas.isdigit():
+                            tiempo += jugas
+                        if jugas.isalpha():
+                            nombres += jugas
+                    tiempo = int(tiempo)
+                    tupla_jugador = (nombres, tiempo)
+                    tims = tiempo
+                    if "TIMER" not in configuracio:
+                        countdown_tread.start()
+            dificultadLabel.config(text=("NIVEL", configuracio[0]))
+            if configuracio[1] == "TIMER":
+                tiempo = ""
+                for confg in configracio:
+                    if confg.isdigit() or confg == ":":
+                        tiempo += confg
+                configuracio.insert(-1, tiempo)
+                horasLabel = tk.Label(jueg, text="HORA")
+                horasLabel.place(x=100, y=700)
+                minutosLabel = tk.Label(jueg, text="MINUTOS")
+                minutosLabel.place(x=150, y=700)
+                segundosLabel = tk.Label(jueg, text="SEGUNDOS")
+                segundosLabel.place(x=210, y=700)
+                horaactual = tk.Label(jueg, text=configuracio[-2][0:1])
+                horaactual.place(x=100, y=720)
+                minutosactualLabel = tk.Label(jueg)
+                if ":" in configuracio[-2][2:4]:
+                    minutosactualLabel.config(text=configuracio[-2][2:3])
                 else:
-                    tupla_jugador = (b, )
+                    minutosactualLabel.config(text=configuracio[-2][2:4])
+                minutosactualLabel.place(x=150, y=720)
+                segundosactualesLabel = tk.Label(jueg)
+                if ":" in configuracio[-2][4:7]:
+                    segundosactualesLabel.config(text=configuracio[-2][5:7])
+                else:
+                    segundosactualesLabel.config(text=configuracio[-2][4:7])
+                segundosactualesLabel.place(x=210, y=720)
             test.close()
 
         def nada():
             pass
 
-        def terminar_juego(configuracio):
+        def terminar_juego(configuracio, cuadriculas):
             global lista_jugadas
             global listajugadas
             global count3
@@ -709,7 +870,11 @@ def principal():
                 count3 = 0
                 count150 = 0
                 countganador = 0
-                iniciar_juego(configuracio)
+                for juegos in cuadriculas:
+                    if juegos == configuracio[0]:
+                        count = random.randint(0, 2)
+                        lista_cuadricula = cuadriculas[juegos][count]
+                        crear_cuadricula(lista_cuadricula)
 
         def aceptar(h, m, s, configuracio):
             global times
@@ -733,20 +898,26 @@ def principal():
             else:
                 messagebox.showerror("Error", "Tiene que cumplir las restricciones")
 
-        def top10():
+        def top10(configuracio):
             global top_10_facil
             global top_10_inter
             global top_10_diff
             global running
+            f = open("futoshiki2021top10.dat", "w")
+            f.write(str(top_10_facil) + "\n")
+            f.write(str(top_10_inter) + "\n")
+            f.write(str(top_10_diff))
+            f.close()
             running = False
             top_10 = tk.Toplevel()
             count0 = 40
             count1 = 40
             count2 = 40
 
-            def close():
+            def destroy():
                 global running
                 running = True
+                top_10.destroy()
                 timer()
 
             top_10.title("TOP 10")
@@ -778,7 +949,8 @@ def principal():
                 tk.Label(top_10, text=top_10_diff[c][0]).place(x=700, y=count2)
                 tk.Label(top_10, text=top_10_diff[c][1]).place(x=800, y=count2)
                 count2 += 50
-            atexit.register(close)
+            if configuracio[1] == "TIMER":
+                top_10.protocol("WM_DELETE_WINDOW", destroy)
             top_10.mainloop()
 
         def timer():
@@ -786,9 +958,8 @@ def principal():
             global tim
             global running
             while running:
-                print(times)
                 if times == 0:
-                    r = messagebox.askquestion("ERROR")
+                    r = messagebox.askquestion("ERROR", "TIEMPO EXPIRADO. ¿DESEA CONTINUAR EL MISMO JUEGO (SI O NO)?")
                     if r == "yes":
                         times += tim + 1
                     else:
@@ -797,8 +968,25 @@ def principal():
 
                 time.sleep(1)
                 times -= 1
-            print(running)
-        countdown_tread = threading.Thread(target=timer)
+
+        def timer_inverso():
+            global run
+            global tims
+            while run:
+                tims += 1
+                time.sleep(1)
+
+        def destroy():
+            global run
+            run = False
+            jueg.destroy()
+
+        if configuracio[1] == "TIMER":
+            countdown_tread = threading.Thread(target=timer)
+        if configuracio[1] == "SI":
+            countdown_tread = threading.Thread(target=timer_inverso)
+
+        jueg.protocol("WM_DELETE_WINDOW", destroy)
 
         futoshikiLabel = tk.Label(jueg, text="FUTOSHIKI", bg="red", bd=50, width=50, fg="White", font=22)
         futoshikiLabel.pack()
@@ -809,7 +997,7 @@ def principal():
         nombredeljugadorLabel.place(x=4, y=140)
         nombredeljugadorEntry = tk.Entry(jueg, textvariable=nombre, width=50)
         nombredeljugadorEntry.place(x=150, y=140)
-        confirmarButton = tk.Button(jueg, text="CONFIRMAR", command=lambda: confirmar(nombre, configuracio))
+        confirmarButton = tk.Button(jueg, text="CONFIRMAR", command=lambda: confirmar(nombre, configuracio, cuadriculas))
         confirmarButton.place(x=455, y=135)
 
         numero1Button = tk.Button(jueg, text=1, command=lambda: button1(), bg="White", width=5, height=3)
@@ -881,12 +1069,12 @@ def principal():
         borrarjuegoButton = tk.Button(jueg, text="BORRAR JUEGO", bg="blue", bd=10)
         borrarjuegoButton.place(x=650, y=600)
 
-        top10Button = tk.Button(jueg, text="TOP 10", bg="yellow", bd=10, command=lambda: top10())
+        top10Button = tk.Button(jueg, text="TOP 10", bg="yellow", bd=10, command=lambda: top10(configuracio))
         top10Button.place(x=850, y=600)
 
         guardarpartidaButton = tk.Button(jueg, text="GUARDAR PARTIDA")
         guardarpartidaButton.place(x=450, y=800)
-        cargarpartidaButton = tk.Button(jueg, text="CARGAR PARTIDA", command=lambda: cargar())
+        cargarpartidaButton = tk.Button(jueg, text="CARGAR PARTIDA", command=lambda: cargar(cuadriculas))
         cargarpartidaButton.place(x=650, y=800)
 
         jueg.mainloop()
@@ -918,6 +1106,9 @@ def principal():
     def salir():
         menu.destroy()
 
+    def ayuda():
+        path = "https://drive.google.com/file/d/1sawtc9kHX_HquP2LpGDDSaBf2hKax7QA/view?usp=sharing"
+        webbrowser.open_new(path)
     """"""""""""""""" Programa Principal"""""
     menu = tk.Tk()
     menu.geometry("1000x500")
@@ -926,7 +1117,7 @@ def principal():
 
     menubar.add_command(label="Jugar", command=lambda: juego(configuracio))
     menubar.add_command(label="Configurar", command=lambda: configuracion(configuracio))
-    menubar.add_command(label="Ayuda")
+    menubar.add_command(label="Ayuda", command=lambda: ayuda())
     menubar.add_command(label="Acerca de", command=lambda: acerca_de())
     menubar.add_command(label="Salir", command=lambda: salir())
 

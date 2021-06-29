@@ -364,7 +364,7 @@ def principal():
             lista_jugada = lista_jugadas
             tupla_jugadas = (str(numero_botones), x, y)
             count1 = 0
-
+            print(countganador, count150, count3)
             if numero_botones == 0:
                 B.config(bg="RED")
                 r = messagebox.showerror("ERROR", " FALTA QUE SELECCIONE UN DÍGITO")
@@ -712,6 +712,7 @@ def principal():
             global configuracio
             global countganador
             global count150
+            global count3
             global tims
             global run
             count1 = 165
@@ -794,7 +795,6 @@ def principal():
                                             nombre_boton(columnas, filas, B, configuracio))
                                             listaBotones += [1]
                                             count150 += 1
-
                                 else:
                                     if len(listaBotones) < 25:
                                         if columnas == int(e[7]) and filas == int(e[10]):
@@ -804,10 +804,9 @@ def principal():
                                             nombre_boton(columnas, filas, B, configuracio))
                                             listaBotones += [1]
                                             count150 += 1
+                                            count3 += 1
                                             tupla_jugadas = (e[3], int(columnas), int(filas))
                                             lista_jugadas.append((tupla_jugadas),)
-
-
 
                                 count2 += 75
                             count2 = 300

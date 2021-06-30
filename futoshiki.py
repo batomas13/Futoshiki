@@ -14,7 +14,8 @@ def principal():
     global top_10_diff
     global times
     configuracio = ["FÁCIL", "SI", "derecha"]
-    top_10_inter = []
+    top_10_inter = [('kkk', '0:0:30'), ('hum', '0:0:59'), ('Pedro', '0:2:15'), ('JUAN', '0:2:20'), ('PAPA', '0:2:25'),
+                   ('him', '0:1:30'), ('her', '0:36:40'), ('MAMA', '0:3:50'), ('casa', '0:4:50'), ('TOMAS', '0:5:30')]
     top_10_facil = []
     top_10_diff = []
     times = 0
@@ -42,12 +43,12 @@ def principal():
         """"""""""""""""""""" FUNCION """""""""""""""
 
         def agregar(b, configuracio):
-            if b.get() in ["FÁCIL", "INTERMEDIO", "DIFÍCIL"]:
-                configuracio[0] = b.get()
-                messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN EL NIVEL DE DIFICULTAD")
+            if b.get() in ["FÁCIL", "INTERMEDIO", "DIFÍCIL"]:  # Analiza lo seleccionad por el usuario
+                configuracio[0] = b.get()                      # Lo agrega a configuración
+                messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN EL NIVEL DE DIFICULTAD") # manda el mensaje
             if b.get() in ["SI", "NO", "TIMER"]:
-                if b.get() == "TIMER":
-                    horasLabel = tk.Label(configraci, text="Horas")
+                if b.get() == "TIMER":                                    # Si al opción del usuario es el timer
+                    horasLabel = tk.Label(configraci, text="Horas")       # Despliega cada opción para el timer
                     minutosLabel = tk.Label(configraci, text="Minutos")
                     segundosLabel = tk.Label(configraci, text="Segundos")
                     horasLabel.pack()
@@ -64,31 +65,31 @@ def principal():
                                                                                                       configuracio))
                     confirmarButton.pack()
                 else:
-                    messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN EL RELOJ")
-                    configuracio[1] = b.get()
+                    messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN EL RELOJ")  # Si no es timer nada más
+                    configuracio[1] = b.get()                                               # lo agrega
             if b.get() in ["derecha", "izquierda"]:
-                configuracio[-1] = b.get()
-                messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN LA POSICIÓN DE LOS BOTONES")
-            f = open("futoshiki2021configuración.dat", "wt")
-            f.write(str(configuracio))
+                configuracio[-1] = b.get()                                                 # Analiza la posición de los
+                messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN LA POSICIÓN DE LOS BOTONES")  # Botones
+            f = open("futoshiki2021configuración.dat", "wt")                              # Crea y guarda el archivo
+            f.write(str(configuracio))                                                    # con la configuración
             f.close()
 
-        def aceptar(h, m, s, configuracio):
+        def aceptar(h, m, s, configuracio):         # funcion para validar el timer
             global times
             hor = int(h.get())
             min = int(m.get())
             seg = int(s.get())
-            if hor == 0 and min == 0 and seg == 0:
-                messagebox.showerror("ERROR", "TIENE QUE AGREGAR TIEMPO")
+            if hor == 0 and min == 0 and seg == 0:        # Si todos los datos del tiempo son igual a 0 manda el error
+                messagebox.showerror("ERROR", "TIENE QUE AGREGAR TIEMPO")  # Correspondiente
                 return
-            if 0 <= hor <= 2 and 0 <= min <= 59 and 0 <= seg <= 59:
+            if 0 <= hor <= 2 and 0 <= min <= 59 and 0 <= seg <= 59:      # Si cumplen las restricciones
                 times = hor * 3600 + min * 60 + seg
                 tiempo = h.get() + ":" + m.get() + ":" + s.get()
                 configuracio[1] = "TIMER"
-                if len(configuracio) == 4:
+                if len(configuracio) == 4:                                    # Si quiere cambiar el timer seleccionado
                     configuracio[2] = tiempo
                 else:
-                    configuracio.insert(-1, tiempo)
+                    configuracio.insert(-1, tiempo)                           # Si no hay tiempo seleccionado
                 messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ A CONFIGURACIÓN EL TIMER")
                 f = open("futoshiki2021configuración.dat", "wt")
                 f.write(str(configuracio))
@@ -208,7 +209,7 @@ def principal():
         jueg.title("Futoshiki")
         """"""""""""""""""""""""" Funciones """""""""""""
 
-        def crear_cuadricula(lista_cuadricula):
+        def crear_cuadricula(lista_cuadricula):     # Funcion que crea la cuadricula
             global countganador
             global count150
             count150 = 0
@@ -266,7 +267,7 @@ def principal():
                     count2 = 300
                 count1 = 165
 
-        def confirmar(nombre, configuracio, cuadricula):
+        def confirmar(nombre, configuracio, cuadricula):         # Funcion que valida el nombre de usuario
             global tupla_jugador
             global top_10_facil
             global top_10_inter
@@ -291,59 +292,29 @@ def principal():
                 iniciarjuegoButton.config(command=lambda: iniciar_juego(configuracio, cuadricula))
                 messagebox.showinfo("SE AGREGÓ", "SE AGREGÓ EL NOMBRE DE USUARIO, SUERTE EN LA PARTIDA")
 
-        def definirtop(configuracio, tiempo_total):
+        def definirtop(configuracio, tupla_jugador):            # Funcion que valida si tiene que entrar al top10
             global top_10_facil
             global top_10_inter
             global top_10_diff
-            count2 = 0
-            count4 = 0
-            count5 = 0
             if configuracio[0] == "FÁCIL":
-                if not top_10_facil:
-                    top_10_facil.append(tupla_jugador)
-                else:
-                    for ranking in top_10_facil:
-                        if ranking[1] > tiempo_total:
-                            print(ranking)
-                            count = top_10_facil.index(ranking)
-                            top_10_facil.insert(count, tupla_jugador)
-                            break
-                        count5 += 1
-                    if count5 == len(top_10_facil):
-                        top_10_facil.append(tupla_jugador)
-                    if len(top_10_facil) > 10:
-                        del top_10_facil[-1]
+                top_10_facil.append(tupla_jugador)
+                top_10_facil = sorted(top_10_facil, key=lambda x: x[1])
+                if len(top_10_facil) > 10:
+                    del top_10_facil[-1]
             if configuracio[0] == "INTERMEDIO":
-                if not top_10_inter:
-                    top_10_inter.append(tupla_jugador)
-                else:
-                    for ranking in top_10_inter:
-                        if ranking[1] > tiempo_total:
-                            count = top_10_inter.index(ranking)
-                            top_10_inter.insert(count, tupla_jugador)
-                            break
-                        count2 += 1
-                    if count2 == len(top_10_inter):
-                        top_10_inter.append(tupla_jugador)
-                    if len(top_10_inter) > 10:
-                        del top_10_inter[-1]
+                top_10_inter.append(tupla_jugador)
+                top_10_inter = sorted(top_10_inter, key=lambda x: x[1])
+                print(len(top_10_inter))
+                if len(top_10_inter) > 10:
+                    del top_10_inter[-1]
             if configuracio[0] == "DIFÍCIL":
-                if not top_10_diff:
-                    top_10_diff.append(tupla_jugador)
-                else:
-                    for ranking in top_10_diff:
-                        if ranking[1] > tiempo_total:
-                            count = top_10_diff.index(ranking)
-                            top_10_diff.insert(count, tupla_jugador)
-                            break
-                        count4 += 1
-                    if count4 == len(top_10_diff):
-                        top_10_diff.append(tupla_jugador)
-                    if len(top_10_diff) > 10:
-                        del top_10_diff[-1]
+                top_10_diff.append(tupla_jugador)
+                top_10_diff = sorted(top_10_diff, key=lambda x: x[1])
+                if len(top_10_diff) > 10:
+                    del top_10_diff[-1]
 
-        def nombre_boton(x, y, B, configuracio):
-            global times
+        def nombre_boton(x, y, B, configuracio):           # Funcion que determina si puede agreagar la jugada así como
+            global times                                   # si ya ganó
             global numero_botones
             global tupla_jugador
             global tupla_jugadas
@@ -364,7 +335,6 @@ def principal():
             lista_jugada = lista_jugadas
             tupla_jugadas = (str(numero_botones), x, y)
             count1 = 0
-            print(countganador, count150, count3)
             if numero_botones == 0:
                 B.config(bg="RED")
                 r = messagebox.showerror("ERROR", " FALTA QUE SELECCIONE UN DÍGITO")
@@ -507,13 +477,12 @@ def principal():
                             tupla_jugador.append(tiempo_total)
                             tupla_jugador = tuple(tupla_jugador)
                             if configuracio[1] != "NO":
-                                print(tiempo_total)
-                                definirtop(configuracio, tiempo_total)
+                                definirtop(configuracio, tupla_jugador)
                             jueg.destroy()
                             juego(configuracio)
 
-        def iniciar_juego(configuracio, cua):
-            global lista_cuadricula
+        def iniciar_juego(configuracio, cua):             # Función que crear la cuadricula por primera vez y activa
+            global lista_cuadricula                       # las otras funciones
             global lista_guardar
             global tupla_jugadas
             global lista_jugadas
@@ -592,7 +561,7 @@ def principal():
                             count2 = 300
                         count1 = 165
 
-        def borrar_jugada():
+        def borrar_jugada():             # Funcion que  borra cada jugada que el usuario hizo
             global lista_jugadas
             global listajugadas
             global count3
@@ -620,10 +589,8 @@ def principal():
                 if jugada in lista_jugadas:
                     lista_jugadas.remove(jugada)
                     messagebox.showinfo("BORRAR JUGADA", "SE BORRO LA JUGADA")
-                else:
-                    messagebox.showerror("ERROR", " NO HAY MÁS JUGADAS PARA BORRAR.")
 
-        def borrar_juego():
+        def borrar_juego():          # Borra el juego y crea una cuadricula de forma aleatoria
             global lista_cuadricula
             global lista_jugadas
             global listajugadas
@@ -639,7 +606,7 @@ def principal():
                 lista_jugadas = []
                 crear_cuadricula(lista_cuadricula)
 
-        def button1():
+        def button1():                     # Funcion que agrega el numero y pone el boton de color verde
             global numero_botones
             numero1Button.config(bg="green")
             numero2Button.config(bg="white")
@@ -684,13 +651,13 @@ def principal():
             numero5Button.config(bg="green")
             numero_botones = 5
 
-        def error(C):
+        def error(C):                   # Funcion si se presiona un boton predeterminado.
             C.config(bg="RED")
             r = messagebox.showerror("Error", "JUGADA NO ES VÁLIDA PORQUE ESTE ES UN DÍGITO FIJO")
             if r == "ok":
                 C.config(bg="white")
 
-        def guardar():
+        def guardar():         # Funcion que guarda la partida
             global lista_cuadricula
             global lista_jugadas
             global tupla_jugador
@@ -706,7 +673,7 @@ def principal():
             f.close()
             messagebox.showinfo("SE GUARDÓ", "SE GUARDÓ SU PARTIDA")
 
-        def cargar(cuadricula):
+        def cargar(cuadricula):             # Funcion que crea la partida
             global tupla_jugador
             global lista_jugada
             global configuracio
@@ -807,7 +774,6 @@ def principal():
                                             count3 += 1
                                             tupla_jugadas = (e[3], int(columnas), int(filas))
                                             lista_jugadas.append((tupla_jugadas),)
-
                                 count2 += 75
                             count2 = 300
                             count1 += 75
@@ -856,7 +822,7 @@ def principal():
         def nada():
             pass
 
-        def terminar_juego(configuracio, cuadriculas):
+        def terminar_juego(configuracio, cuadriculas):                  # Funcion que termina el juego
             global lista_jugadas
             global listajugadas
             global count3
@@ -875,7 +841,7 @@ def principal():
                         lista_cuadricula = cuadriculas[juegos][count]
                         crear_cuadricula(lista_cuadricula)
 
-        def aceptar(h, m, s, configuracio):
+        def aceptar(h, m, s, configuracio):         # funcion que valida los nuevos datos de ingreso del timer
             global times
             hor = int(h.get())
             min = int(m.get())
@@ -897,7 +863,7 @@ def principal():
             else:
                 messagebox.showerror("Error", "Tiene que cumplir las restricciones")
 
-        def top10(configuracio):
+        def top10(configuracio):             # Funcion que crea la ventana con el timer
             global top_10_facil
             global top_10_inter
             global top_10_diff
@@ -952,11 +918,18 @@ def principal():
                 top_10.protocol("WM_DELETE_WINDOW", destroy)
             top_10.mainloop()
 
-        def timer():
+        def timer():                 # Funcion que hace un timer
             global times
             global tim
             global running
             while running:
+                minutos, segundos = divmod(times, 60)
+                horas = 0
+                if minutos > 60:
+                    horas, minutos = divmod(minutos, 60)
+                horaactual.config(text=horas)
+                minutosactualLabel.config(text=minutos)
+                segundosactualesLabel.config(text=segundos)
                 if times == 0:
                     r = messagebox.askquestion("ERROR", "TIEMPO EXPIRADO. ¿DESEA CONTINUAR EL MISMO JUEGO (SI O NO)?")
                     if r == "yes":
@@ -966,9 +939,10 @@ def principal():
                         juego(configuracio)
 
                 time.sleep(1)
+                #jueg.update()
                 times -= 1
 
-        def timer_inverso():
+        def timer_inverso():           # En caso de que no haya timer funcion que cuenta el tiempo de juego del usuario
             global run
             global tims
             while run:
@@ -1122,3 +1096,6 @@ def principal():
 
     menu.config(menu=menubar)
     menu.mainloop()
+
+
+
